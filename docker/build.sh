@@ -8,6 +8,11 @@ IMAGE_NAME="${IMAGE_NAME:-aeryn-base}"
 TARGET_PLATFORM="linux/amd64"          # we always build x86_64 images
 ROOTFS_BUILDER_IMAGE="aeryn-rootfs-builder:tmp"
 TAR_FILE="./aeryn-rootfs.tar"
+STDERR_LOG="stderr.log"
+# cleanup stderr.log
+if [[ -f "${STDERR_LOG}" ]]; then
+    rm -f "${STDERR_LOG}"
+fi
 
 # ----------------------------------------------------------------------
 # Detect container runtime (podman or docker)
@@ -50,7 +55,7 @@ select_dockerfile() {
 # ----------------------------------------------------------------------
 cleanup() {
     echo "Cleaning up temporary resources..."
-    ${RUNTIME} rmi -f "${ROOTFS_BUILDER_IMAGE}" &>/dev/null || true
+    #${RUNTIME} rmi -f "${ROOTFS_BUILDER_IMAGE}" &>/dev/null || true
     rm -f "${TAR_FILE}"
 }
 trap cleanup EXIT
@@ -77,10 +82,12 @@ main() {
         --privileged --rm \
         -v "$(pwd)/install-rootfs.sh:/install-rootfs.sh:ro" \
         "${ROOTFS_BUILDER_IMAGE}" \
-        bash -c "/install-rootfs.sh >&2 && tar -cf - -C /output/rootfs ." > "${TAR_FILE}" 2>stderr.log
+        bash -c "/install-rootfs.sh >&2 && tar -cf - -C /output/rootfs ." \
+        > "${TAR_FILE}" 2> >(tee "${STDERR_LOG}" >&2)
+
     # get VERSION from stderr.log
-    VERSION=$(grep -oP 'AerynOS_VERSION=\K.*' stderr.log || echo "$(date +%Y%m%d)")
-    rm -f stderr.log
+    VERSION=$(grep -oP 'AerynOS_VERSION=\K.*' "${STDERR_LOG}" || echo "$(date +%Y%m%d)")
+    rm -f "${STDERR_LOG}"
 
     IMAGE_FULLNAME="${IMAGE_NAME}:${VERSION}"
     IMAGE_LATEST="${IMAGE_NAME}:latest"

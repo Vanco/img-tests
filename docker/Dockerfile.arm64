@@ -68,9 +68,10 @@ RUN if [ "${BUILDARCH}" != "${TARGETARCH}" ] && [ "${TARGETARCH}" = "amd64" ]; t
     cp ${RELEASE_DIR}/moss /usr/local/bin/moss
 
 # Complete the post-build steps from `just get-started` (licenses, data files, profiles)
-RUN bash licenses.sh
+RUN bash licenses.sh && ls -l license-list-data/text/
 RUN mkdir -p /usr/share/boulder/licenses && \
-    cp -R boulder/data/{macros,*.yaml} /usr/share/boulder/ && \
+    cp -R boulder/data/macros /usr/share/boulder/ && \
+    cp -R boulder/data/*.yaml /usr/share/boulder/ && \
     cp license-list-data/text/* /usr/share/boulder/licenses/
 RUN mkdir -p /etc/boulder && \
     cp -R boulder/data/profile.d /etc/boulder/
