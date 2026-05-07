@@ -18,21 +18,21 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Use Alibaba Cloud mirror for Rustup (accelerates toolchain downloads)
-ENV RUSTUP_DIST_SERVER="https://mirrors.aliyun.com/rustup"
-ENV RUSTUP_UPDATE_ROOT="https://mirrors.aliyun.com/rustup/rustup"
+#ENV RUSTUP_DIST_SERVER="https://mirrors.aliyun.com/rustup"
+#ENV RUSTUP_UPDATE_ROOT="https://mirrors.aliyun.com/rustup/rustup"
 
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Use Alibaba Cloud mirror for Cargo (accelerates crate downloads)
-RUN mkdir -p /root/.cargo && \
-    echo '[source.crates-io]' > /root/.cargo/config.toml && \
-    echo 'replace-with = "aliyun"' >> /root/.cargo/config.toml && \
-    echo '' >> /root/.cargo/config.toml && \
-    echo '[source.aliyun]' >> /root/.cargo/config.toml && \
-    echo 'registry = "sparse+https://mirrors.aliyun.com/crates.io-index/"' >> /root/.cargo/config.toml && \
-    echo '' >> /root/.cargo/config.toml
+#RUN mkdir -p /root/.cargo && \
+#    echo '[source.crates-io]' > /root/.cargo/config.toml && \
+#    echo 'replace-with = "aliyun"' >> /root/.cargo/config.toml && \
+#    echo '' >> /root/.cargo/config.toml && \
+#    echo '[source.aliyun]' >> /root/.cargo/config.toml && \
+#    echo 'registry = "sparse+https://mirrors.aliyun.com/crates.io-index/"' >> /root/.cargo/config.toml && \
+#    echo '' >> /root/.cargo/config.toml
 
 # Add the cross-compilation target only when host arch != target arch
 RUN if [ "${BUILDARCH}" != "${TARGETARCH}" ] && [ "${TARGETARCH}" = "amd64" ]; then \
