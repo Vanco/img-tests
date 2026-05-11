@@ -12,21 +12,21 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Use Alibaba Cloud mirror for Rustup (speeds up toolchain downloads)
-ENV RUSTUP_DIST_SERVER="https://mirrors.aliyun.com/rustup"
-ENV RUSTUP_UPDATE_ROOT="https://mirrors.aliyun.com/rustup/rustup"
+#ENV RUSTUP_DIST_SERVER="https://mirrors.aliyun.com/rustup"
+#ENV RUSTUP_UPDATE_ROOT="https://mirrors.aliyun.com/rustup/rustup"
 
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Use Alibaba Cloud mirror for Cargo (speeds up crate downloads)
-RUN mkdir -p /root/.cargo && \
-   echo '[source.crates-io]' > /root/.cargo/config.toml && \
-   echo 'replace-with = "aliyun"' >> /root/.cargo/config.toml && \
-   echo '' >> /root/.cargo/config.toml && \
-   echo '[source.aliyun]' >> /root/.cargo/config.toml && \
-   echo 'registry = "sparse+https://mirrors.aliyun.com/crates.io-index/"' >> /root/.cargo/config.toml && \
-   echo '' >> /root/.cargo/config.toml
+#RUN mkdir -p /root/.cargo && \
+#   echo '[source.crates-io]' > /root/.cargo/config.toml && \
+#   echo 'replace-with = "aliyun"' >> /root/.cargo/config.toml && \
+#   echo '' >> /root/.cargo/config.toml && \
+#   echo '[source.aliyun]' >> /root/.cargo/config.toml && \
+#   echo 'registry = "sparse+https://mirrors.aliyun.com/crates.io-index/"' >> /root/.cargo/config.toml && \
+#   echo '' >> /root/.cargo/config.toml
 
 # Install just via Cargo
 RUN cargo install just
@@ -46,13 +46,11 @@ RUN just get-started
 ENV PATH="/root/.local/bin:${PATH}"
 
 # Set up directories for moss installation
-#moss -D /output/rootfs install -y fastfetch pkgset-aeryn-base pkgset-aeryn-utilities tree vim btop starship && \
-#
 WORKDIR /output/rootfs
-COPY system-model.kdl /tmp/system-model.kdl
+COPY docker-model.kdl /tmp/docker-model.kd
 RUN --security=insecure \
     moss -D /output/rootfs repo add volatile https://build.aerynos.dev/stream/volatile/x86_64/stone.index && \
-    moss -D /output/rootfs sync -u --import /tmp/system-model.kdl -y && \
+    moss -D /output/rootfs sync -u --import /tmp/docker-model.kdl -y && \
     mkdir -p /output/rootfs/home /output/rootfs/root && \
     rm -rf /output/rootfs/.moss/cache/downloads/*
 
@@ -60,7 +58,8 @@ CMD [ "/bin/bash" ]
 
 FROM scratch
 
-ENV PATH="/usr/local/bin:/usr/bin:/bin:/sbin"
+ENV PATH="/usr/local/bin:/usr/bin:/bin:/sbin" \
+    LANG="en_US.UTF-8"
 
 COPY --from=rootfs-builder /output/rootfs /
 
@@ -76,8 +75,6 @@ RUN <<EOF
     if [[ -f /etc/shadow ]]; then
         sed -i 's/^root:[^:]*:/root::/' /etc/shadow
     fi
-    #echo 'export PS1="\\u@\\h:\\w\\$ "' > /root/.bashrc
-    #echo 'export PS1="\\u@\\h:\\w\\$ "' > /etc/bashrc
 EOF
 
 WORKDIR /root
