@@ -1,0 +1,19 @@
+repositories {
+    volatile {
+        description ...
+        uri "https://build.aerynos.dev/stream/volatile/x86_64/stone.index"
+        priority 0
+    }
+}
+packages {
+    bind-utils
+    btop
+    coreutils
+    fastfetch
+    git
+    inetutils
+    pkgset-aeryn-base
+    pkgset-aeryn-utilities
+    starship
+    vim
+}
