@@ -1,6 +1,6 @@
 repositories {
     volatile {
-        description ...
+        description "..."
         uri "https://build.aerynos.dev/stream/volatile/x86_64/stone.index"
         priority 0
     }
