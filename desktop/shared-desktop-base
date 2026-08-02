@@ -8,8 +8,6 @@ font-noto-emoji
 liberation-fonts-ttf
 
 # Shared Kernel and Boot related stuff
-bcachefs-module-stable
-bcachefs-tools
 kmod
 linux-stable
 linux-firmware
@@ -20,6 +18,7 @@ linux-firmware-nvidia
 lvm2
 plymouth
 sof-firmware
+systemd-boot
 zram-generator-defaults
 
 # Shared VM related QoL utilities
