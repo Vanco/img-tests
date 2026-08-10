@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# SPDX-FileCopyrightText: © 2020-2023 Serpent OS Developers
-#
+# SPDX-FileCopyrightText: © 2020 aerynOS Developers
 # SPDX-License-Identifier: MPL-2.0
 #
 # AerynOS prototype linux-desktop ISO image generator
@@ -343,6 +342,9 @@ build() {
     cp -v "${BOOT}/kernel" "${MOUNT}/"
     cp -v "${BOOT}/initrd" "${MOUNT}/"
     umount -Rlv "${MOUNT}"
+
+    echo ">>> Run fsck on the newly built EFI image..."
+    fsck.vfat -av "${TMPFS}/efi.img"
 
     echo ">>> Put the new EFI image in the correct place..."
     mkdir -pv "${TMPFS}/root/EFI/Boot"
