@@ -7,7 +7,7 @@
 # AerynOS prototype linux-desktop ISO image generator
 #
 
-set -euo pipefail
+set -uo pipefail
 
 
 die () {
