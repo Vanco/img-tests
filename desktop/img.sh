@@ -57,7 +57,7 @@ function usage() {
 ASK="yes"
 PACKAGE_LIST="gnome_pkglist"
 OUTPUT="aerynos"
-TMPDIR="/tmp"
+TMPDIR="."
 
 while getopts 'c:o:p:t:hy?' opt
 do
@@ -204,6 +204,8 @@ cleanup () {
         echo "\$TMPFS is not set (or is empty), cannot clean up -- exiting."
         exit 1
     fi
+    echo -e "\nSpace used on ${TMPFS} prior to cleaning up:"
+    du -csx -BM "${TMPFS}"
     echo -e "\nCleaning up existing dirs, files and mount points..."
     # clean up dirs (if something fails here, let the remaining lines take care of it)
     rm -rf "${TMPFS}"/* || echo "- Removing ${TMPFS}/* failed."
@@ -266,7 +268,9 @@ build() {
     #time ${MOSS} repo add local file:///home/ermo/.cache/local_repo/x86_64/stone.index -p10 || die_and_cleanup "Adding moss repo failed!"
 
     echo ">>> Install packages to ${AFSDIR}/ ..."
+    du -csx -BM ${TMPFS}
     time ${MOSS} install -y "${PACKAGES[@]}" || die_and_cleanup "Installing packages failed!"
+    du -csx -BM ${TMPFS}
 
     echo ">>> Set up basic environment in ${AFSDIR}/ ..."
     time ${CHROOT} -D "${AFSDIR}" systemd-firstboot --force --delete-root-password --locale=en_US.UTF-8 --timezone=UTC --root-shell=/usr/bin/bash && echo ">>>>> systemd-firstboot run done."
@@ -292,6 +296,7 @@ build() {
     cp -av "${AFSDIR}"/usr/lib/modules/*/vmlinux "${BOOT}/kernel"
 
     echo ">>> Install dracut in ${AFSDIR}/ ..."
+    du -csx -BM ${TMPFS}
     time ${MOSS} install "${initrd[@]}" -y || die_and_cleanup "Failed to install initrd packages!"
 
     echo ">>> Regenerate dracut..."
