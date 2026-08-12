@@ -1,3 +1,4 @@
 binary(fastfetch)
+binary(systemd-nspawn)
 pkgset-aeryn-base
 pkgset-aeryn-utilities
